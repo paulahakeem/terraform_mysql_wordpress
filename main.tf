@@ -33,19 +33,20 @@ module "frontendEC2" {
   depends_on                  = [module.network]
 }
 
-# resource "null_resource" "update_docker_compose" {
-#   provisioner "local-exec" {
-#     command = "bash ./update_docker_compose.sh"
-#   }
+resource "null_resource" "update_docker_compose" {
+  provisioner "local-exec" {
+    command = "bash ./update_docker_compose.sh"
+  }
 
-#   # Trigger the execution whenever there's a change in the frontend EC2 instance
-#   triggers = {
-#     when_frontend_ec2_private_ip_changed = module.frontendEC2.db_id
-#   }
+  # Trigger the execution whenever there's a change in the frontend EC2 instance
+  triggers = {
+    when_frontend_ec2_private_ip_changed = module.frontendEC2.db_id
+  }
 
-#   # Ensure the execution order is respected
-#   depends_on = [module.frontendEC2]
-# }
+  # Ensure the execution order is respected
+  depends_on = [module.frontendEC2]
+}
+
 
 
 module "load_balancer" {
