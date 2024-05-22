@@ -20,10 +20,10 @@ module "network" {
   eg_protocol                 = "-1"
 }
 
-module "backendEC2" {
+module "frontendEC2" {
   source                      = "./modules/VMS"
   ec2_name                    = "paula-db"
-  ec2_ami                     = "ami-04868818694d21658"
+  ec2_ami                     = "ami-04b70fa74e45c3917"
   ec2_type                    = "t3.micro"
   SG_id                       = [module.network.secgroup-id]
   ec2_subnet_ID               = module.network.private_subnet_id1
@@ -37,7 +37,14 @@ resource "null_resource" "update_docker_compose" {
   provisioner "local-exec" {
     command = "bash ./update_docker_compose.sh"
   }
-  depends_on = [module.backendEC2]
+
+  # Trigger the execution whenever there's a change in the frontend EC2 instance
+  triggers = {
+    frontend_ec2_instance_id = module.frontendEC2.instance_id
+  }
+
+  # Ensure the execution order is respected
+  depends_on = [module.frontendEC2]
 }
 
 module "load_balancer" {
@@ -85,10 +92,6 @@ module "ASG" {
   alb_target_group_arn       = module.load_balancer.target_group_arn
   depends_on                 = [null_resource.update_docker_compose]
 }
-
-
-
-
 
 output "mysql_private_ip" {
   value = module.load_balancer.lb_dns_name
