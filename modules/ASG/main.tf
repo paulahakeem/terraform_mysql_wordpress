@@ -1,5 +1,5 @@
 resource "aws_autoscaling_group" "wordpress_asg" {
-  name_prefix                      = var.name
+  name                      = var.name
   health_check_grace_period       = var.health_check_grace_period
   health_check_type               = var.health_check_type
   force_delete                    = var.force_delete

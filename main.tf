@@ -21,7 +21,7 @@ module "network" {
 }
 
 module "frontendEC2" {
-  source                      = "./modules/VMS"
+  source                      = "./modules/DB"
   ec2_name                    = "paula-db"
   ec2_ami                     = "ami-04b70fa74e45c3917"
   ec2_type                    = "t3.micro"
@@ -39,9 +39,9 @@ resource "null_resource" "update_docker_compose" {
   }
 
   # Trigger the execution whenever there's a change in the frontend EC2 instance
-  triggers = {
-    frontend_ec2_instance_id = module.frontendEC2.instance_id
-  }
+triggers = {
+  when_frontend_ec2_private_ip_changed = module.frontendEC2.db_id
+}
 
   # Ensure the execution order is respected
   depends_on = [module.frontendEC2]
@@ -77,7 +77,7 @@ module "lunch_template" {
 
 module "ASG" {
   source                     = "./modules/ASG"
-  name                       = "paula-asg-5548"
+  name                       = "paula-asg"
   health_check_grace_period  = 100
   health_check_type          = "ELB"
   force_delete               = true
@@ -88,12 +88,12 @@ module "ASG" {
   launch_template_id         = module.lunch_template.launch_template_id
   versions                   = "$Latest"
   cpu_policy_percentage      = 50.0
-  ec2_instance_name          = "paula"
+  ec2_instance_name          = "paula_wordpress"
   alb_target_group_arn       = module.load_balancer.target_group_arn
   depends_on                 = [null_resource.update_docker_compose]
 }
 
-output "mysql_private_ip" {
+output "DNS_LINK" {
   value = module.load_balancer.lb_dns_name
 }
 

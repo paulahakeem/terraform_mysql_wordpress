@@ -1,4 +1,4 @@
-resource "aws_instance" "public-ec2" {
+resource "aws_instance" "private-ec2" {
   ami                         = var.ec2_ami
   instance_type               = var.ec2_type
   vpc_security_group_ids      = var.SG_id
@@ -10,7 +10,7 @@ resource "aws_instance" "public-ec2" {
     Name = var.ec2_name
   }
     provisioner "local-exec" {
-    command = "echo '${aws_instance.public-ec2.private_ip}' > instance_ip.txt"
+    command = "echo '${aws_instance.private-ec2.private_ip}' > instance_ip.txt"
   }
 }
 
