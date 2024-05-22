@@ -11,6 +11,9 @@ resource "aws_instance" "private-ec2" {
   }
     provisioner "local-exec" {
     command = "echo '${aws_instance.private-ec2.private_ip}' > instance_ip.txt"
+  # }
+  #     lifecycle {
+  #   prevent_destroy = true
   }
 }
 

@@ -18,6 +18,7 @@ module "network" {
   in_protocol                 = "tcp"
   eg_port                     = 0
   eg_protocol                 = "-1"
+
 }
 
 module "frontendEC2" {
@@ -31,6 +32,7 @@ module "frontendEC2" {
   key_pair                    = "paula-key"
   user_data                   = file("./install2.sh")
   depends_on                  = [module.network]
+
 }
 
 resource "null_resource" "update_docker_compose" {
@@ -100,3 +102,17 @@ module "s3_backend" {
 output "DNS_LINK" {
   value = module.load_balancer.lb_dns_name
 }
+
+# ----------------------- ------------------------------------#
+# module "ansible" {
+#   source                      = "./modules/VMS"
+#   ec2_name                    = "paula_ansible"
+#   ec2_ami                     = "ami-04b70fa74e45c3917"
+#   ec2_type                    = "t3.micro"
+#   SG_id                       = [module.network.secgroup-id]
+#   ec2_subnet_ID               = module.network.public_subnet_id1
+#   associate_public_ip_address = true
+#   key_pair                    = "paula-key"
+#   # user_data                   = file("./install.sh")
+# }
+# --
