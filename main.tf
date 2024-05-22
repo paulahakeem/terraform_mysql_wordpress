@@ -100,35 +100,3 @@ module "s3_backend" {
 output "DNS_LINK" {
   value = module.load_balancer.lb_dns_name
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# # ----------------------- ------------------------------------#
-# module "frontendEC2" {
-#   source                      = "./modules/VMS"
-#   ec2_name                    = "frontend"
-#   ec2_ami                     = "ami-0cd59ecaf368e5ccf"
-#   ec2_type                    = "t2.micro"
-#   SG_id                       = [module.network.secgroup-id]
-#   ec2_subnet_ID               = module.network.public_subnet_id
-#   associate_public_ip_address = true
-#   key_pair                    = "paula"
-#   user_data                   = file("./install.sh")
-# }
-# # ----------------------- ------------------------------------#
