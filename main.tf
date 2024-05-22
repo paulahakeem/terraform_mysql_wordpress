@@ -1,9 +1,9 @@
 module "network" {
-  source               = "./modules/NETWORK"
-  vpc_name             = "Paula-MainVpc"
-  vpc_cidr             = "10.0.0.0/16"
-  enable_dns_support   = true
-  enable_dns_hostnames = true
+  source                      = "./modules/NETWORK"
+  vpc_name                    = "Paula-MainVpc"
+  vpc_cidr                    = "10.0.0.0/16"
+  enable_dns_support          = true
+  enable_dns_hostnames        = true
   subnets                     = var.subnets
   availability_zones          = "us-east-1a"
   auto_assign_public_ip_state = true
@@ -39,9 +39,9 @@ resource "null_resource" "update_docker_compose" {
   }
 
   # Trigger the execution whenever there's a change in the frontend EC2 instance
-triggers = {
-  when_frontend_ec2_private_ip_changed = module.frontendEC2.db_id
-}
+  triggers = {
+    when_frontend_ec2_private_ip_changed = module.frontendEC2.db_id
+  }
 
   # Ensure the execution order is respected
   depends_on = [module.frontendEC2]
@@ -76,21 +76,25 @@ module "lunch_template" {
 }
 
 module "ASG" {
-  source                     = "./modules/ASG"
-  name                       = "paula-asg"
-  health_check_grace_period  = 100
-  health_check_type          = "ELB"
-  force_delete               = true
-  vpc_zone_identifier        = [module.network.public_subnet_id1, module.network.public_subnet_id2]
-  desired_capacity           = 1
-  max_size                   = 4
-  min_size                   = 1
-  launch_template_id         = module.lunch_template.launch_template_id
-  versions                   = "$Latest"
-  cpu_policy_percentage      = 50.0
-  ec2_instance_name          = "paula_wordpress"
-  alb_target_group_arn       = module.load_balancer.target_group_arn
-  depends_on                 = [null_resource.update_docker_compose]
+  source                    = "./modules/ASG"
+  name                      = "paula-asg"
+  health_check_grace_period = 100
+  health_check_type         = "ELB"
+  force_delete              = true
+  vpc_zone_identifier       = [module.network.public_subnet_id1, module.network.public_subnet_id2]
+  desired_capacity          = 1
+  max_size                  = 4
+  min_size                  = 1
+  launch_template_id        = module.lunch_template.launch_template_id
+  versions                  = "$Latest"
+  cpu_policy_percentage     = 50.0
+  ec2_instance_name         = "paula_wordpress"
+  alb_target_group_arn      = module.load_balancer.target_group_arn
+  depends_on                = [null_resource.update_docker_compose]
+}
+
+module "s3_backend" {
+  source = "./modules/s3_backend"
 }
 
 output "DNS_LINK" {
