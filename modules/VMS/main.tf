@@ -10,10 +10,8 @@ resource "aws_instance" "public-ec2" {
     Name = var.ec2_name
   }
 
-#  provisioner "local-exec" {
-#   command = <<EOT
-#     ansible-playbook -e /home/paula/terraform_mysql_wordpress/terraform_mysql_wordpress/modules/VMS/ansible/override_vars.yml -i /home/paula/terraform_mysql_wordpress/terraform_mysql_wordpress/modules/VMS/ansible/demo.aws_ec2.yml /home/paula/terraform_mysql_wordpress/terraform_mysql_wordpress/modules/VMS/ansible/wordpress.yaml
-#   EOT
-# }
+ provisioner "local-exec" {
+    command = "ansible-playbook -i ${aws_instance.public-ec2.public_ip}, wordpress.yaml"
+  }
 
 }

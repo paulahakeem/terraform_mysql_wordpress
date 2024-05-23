@@ -104,7 +104,6 @@ module "s3_backend" {
 output "DNS_LINK" {
   value = module.load_balancer.lb_dns_name
 }
-<<<<<<< HEAD
 
 # ----------------------- ------------------------------------#
 # module "ansible" {
@@ -119,5 +118,3 @@ output "DNS_LINK" {
 #   # user_data                   = file("./install.sh")
 # }
 # --
-=======
->>>>>>> b3c9187dc4762b03bbb61da7775c5b54d27d256d
