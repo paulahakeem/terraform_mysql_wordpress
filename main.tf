@@ -49,6 +49,8 @@ resource "null_resource" "update_docker_compose" {
   depends_on = [module.frontendEC2]
 }
 
+
+
 module "load_balancer" {
   source                     = "./modules/LB"
   lb_name                    = "paulaLB"
@@ -102,6 +104,7 @@ module "s3_backend" {
 output "DNS_LINK" {
   value = module.load_balancer.lb_dns_name
 }
+<<<<<<< HEAD
 
 # ----------------------- ------------------------------------#
 # module "ansible" {
@@ -116,3 +119,5 @@ output "DNS_LINK" {
 #   # user_data                   = file("./install.sh")
 # }
 # --
+=======
+>>>>>>> b3c9187dc4762b03bbb61da7775c5b54d27d256d
