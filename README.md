@@ -1,66 +1,81 @@
-# Terraform Infrastructure Deployment
+# WordPress Deployment on AWS with Docker, Nginx, and Terraform
 
-## Overview
-This Terraform code automates the deployment of a basic AWS infrastructure including a Virtual Private Cloud (VPC), subnets, route tables, internet gateway, NAT gateway, security groups, EC2 instances, and an RDS instance.
+This project automates the setup of a scalable and highly available WordPress deployment on AWS using Docker containers orchestrated with Docker Compose, Nginx as a load balancer, and Terraform for infrastructure provisioning.
 
-## Resources Created
+## Requirements
 
-### VPC
-- Creates a VPC with specified CIDR block, DNS support, and DNS hostnames.
+1. **Create an EC2 Machine and Install Docker**
+2. **Create a Docker Compose File with the Following Requirements:**
+   - Use the WordPress image.
+   - Run 2 containers of WordPress on 2 different ports consecutively (the 1st instance must be up and healthy before starting the 2nd instance).
+   - Use a MySQL database on a different EC2 machine.
+3. **Create an Nginx Load Balancer to Balance Traffic Between the 2 WordPress Instances**
+4. **Create an AMI from the EC2 Machine and Add it to Your Launch Template**
+5. **Ensure that `wp-content/uploads` Directory is Persistent**
+6. **Add 1 Machine to Your Auto Scaling Group**
 
-### Subnets
-- Creates subnets within the VPC across specified availability zones.
+## Expected Output
 
-### Route Tables
-- Defines route tables for both public and private subnets.
-- Associates the public subnet with an internet gateway for public internet access.
-- Associates the private subnet with a NAT gateway for outbound internet access.
+A machine in your auto-scaling group with Nginx forwarding traffic to 2 WordPress containers that are linked to the MySQL database. The files in `wp-content/uploads` should always be present when containers get replaced.
 
-### Internet Gateway & NAT Gateway
-- Creates an internet gateway for the VPC.
-- Associates the internet gateway with the VPC.
-- Allocates an Elastic IP address for the NAT gateway.
-- Creates a NAT gateway within the public subnet.
+## Setup Instructions
 
-### Security Groups
-- Defines a security group allowing specified inbound traffic.
-- Allows inbound traffic on ports 80, 22, and 443.
-- Allows all outbound traffic.
+### 1. Create EC2 Instances
 
-### EC2 Instances
-- Deploys EC2 instances with specified configurations (AMI, instance type, subnet, security group, etc.).
-- Configures public IP address association for instances.
-- Assigns key pair for SSH access.
+1. **Network Setup**:
+   - Configure VPC, subnets, and security groups using the provided Terraform module `network`.
 
-### RDS Instance
-- Creates an RDS instance with specified configurations (engine, storage, username, password, etc.).
-- Configures the instance to be not publicly accessible.
+2. **MySQL Database EC2**:
+   - Launch an EC2 instance for the MySQL database using the provided Terraform module `frontendEC2`.
+   - Install MySQL and set up the WordPress database using the `mysql_installation.sh` script.
 
-## Modules
+### 2. Setup MySQL Database
 
-### Network
-- Manages VPC, subnets, route tables, internet gateway, NAT gateway, and security groups.
+- Ensure MySQL is running and configured to allow remote connections.
+- Note down the private IP address of the MySQL instance.
 
-### Virtual Machines (VMs)
-- Deploys EC2 instances for backend and frontend services.
+### 3. Configure Docker and Docker Compose
 
-### Database
-- Creates an RDS instance for database management.
+1. **Docker Installation**:
+   - Install Docker and Docker Compose on the EC2 instance using the `TEMPLATE_installation.sh` script.
 
-## Configuration
-- Parameters such as VPC CIDR block, subnet details, security group settings, EC2 configurations, and RDS settings are provided as variables to customize the deployment.
+2. **Update Docker Compose**:
+   - Use the `update_docker_compose.sh` script to dynamically update the Docker Compose file with the MySQL database IP.
+
+### 4. Create AMI and Launch Template
+
+- Create an AMI from the EC2 instance and add it to your launch template using the provided Terraform module `lunch_template`.
+
+### 5. Setup Auto Scaling Group
+
+- Set up an Auto Scaling Group with the created launch template to ensure high availability and scalability using the provided Terraform module `ASG`.
 
 ## Usage
-1. Ensure Terraform is installed.
-2. Update the variables in `variables.tf` to match your requirements.
-3. Run `terraform init` to initialize the working directory.
-4. Run `terraform apply` to apply the Terraform configuration and create the infrastructure.
-5. After deployment, the public IP addresses of EC2 instances are stored in `instance_ip.txt` for reference.
 
-## Note
-- Ensure appropriate AWS credentials are configured for Terraform to manage the infrastructure.
-- Review the security settings and adjust them according to your specific requirements and best practices.
-- This README provides a high-level overview; for detailed understanding, refer to individual Terraform configuration files.
+- Access the WordPress site through the DNS link provided by the load balancer output in Terraform.
+- Verify that the `wp-content/uploads` directory remains persistent across container replacements.
 
-## repo used in project 
-https://github.com/paulahakeem/docker-abi
+## Detailed Explanation of `update_docker_compose.sh`
+
+The `update_docker_compose.sh` script performs the following tasks:
+1. **Clones the Repository**: It clones the GitHub repository containing the Docker Compose template.
+2. **Fetches MySQL IP**: It fetches the private IP address of the MySQL instance from a file.
+3. **Updates Docker Compose File**: It replaces a placeholder in the Docker Compose template with the actual MySQL IP address.
+4. **Commits and Pushes Changes**: It commits the updated Docker Compose file to a new branch and pushes the changes to the GitHub repository.
+
+This script ensures that the Docker Compose file always has the correct MySQL IP address, allowing the WordPress containers to connect to the database without manual intervention.
+
+## Contributing
+
+To contribute to this project, please follow these steps:
+
+1. Fork the repository.
+2. Create a new branch (`git checkout -b feature/your-feature`).
+3. Commit your changes (`git commit -m 'Add some feature'`).
+4. Push to the branch (`git push origin feature/your-feature`).
+5. Open a pull request.
+
+
+---
+
+Repository used: [paulahakeem/docker-abi](https://github.com/paulahakeem/docker-abi/)
