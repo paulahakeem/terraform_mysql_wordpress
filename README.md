@@ -61,3 +61,6 @@ This Terraform code automates the deployment of a basic AWS infrastructure inclu
 - Ensure appropriate AWS credentials are configured for Terraform to manage the infrastructure.
 - Review the security settings and adjust them according to your specific requirements and best practices.
 - This README provides a high-level overview; for detailed understanding, refer to individual Terraform configuration files.
+
+## repo used in project 
+https://github.com/paulahakeem/docker-abi
