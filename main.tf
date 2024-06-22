@@ -30,7 +30,7 @@ module "frontendEC2" {
   ec2_subnet_ID               = module.network.private_subnet_id1
   associate_public_ip_address = false
   key_pair                    = "paula-key"
-  user_data                   = file("./install2.sh")
+  user_data                   = file("./mysql_installation.sh")
   depends_on                  = [module.network]
 
 }
@@ -74,7 +74,7 @@ module "lunch_template" {
   security_group_id           = [module.network.secgroup-id]
   subnet_id                   = module.network.public_subnet_id1
   associate_public_ip_address = true
-  user_data                   = base64encode(file("./install.sh"))
+  user_data                   = base64encode(file("./TEMPLATE_installation.sh"))
   monitoring                  = true
   depends_on                  = [null_resource.update_docker_compose]
 }
